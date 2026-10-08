@@ -160,6 +160,9 @@ Nenhum segredo ou chave de API é commitado neste repositório. O arquivo `.giti
 
 ---
 
-## 📝 Licença
+## 📝 Licença & Diretrizes
 
 Distribuído sob a licença [MIT](LICENSE). Desenvolvido para a comunidade do **The Simple Place**.
+
+* 📜 [Termos de Serviço](TERMS.md)
+* 🔒 [Política de Privacidade](PRIVACY.md)
