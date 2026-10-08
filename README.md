@@ -48,6 +48,7 @@ Todos os comandos podem ser acionados tanto por comandos de barra (`/`) quanto p
 | `/jogosgratis` | `!st jogosgratis` | Consulta promoções ativas de jogos 100% gratuitos para PC. | `!st jogosgratis` |
 | `/perguntar <pergunta>` | `!st perguntar <dúvida>` | Envia uma dúvida para a IA do Google Gemini. | `!st perguntar quem tem razão?` |
 | `/kebab` | `!st kebab` | Invoca a iguaria cibernética Kebabtech de Night City. | `!st kebab` |
+| `/boasvindas <ativar/desativar/status/testar>` | `!st boasvindas <comando>` | Gerencia recepção e mensagens automáticas para novos membros. | `/boasvindas ativar #geral` |
 | — | `!st ajuda` | Exibe o menu com todos os comandos alternativos. | `!st ajuda` |
 
 > 💡 **Embed Fixer:** Funciona automaticamente no chat de texto (especialmente em `#memes-e-midia`). Ao postar links do Twitter, Instagram Reels, TikTok ou Reddit, o bot reescreve com o preview corrigido.
@@ -68,13 +69,15 @@ simpletron/
 │   ├── games.py               # Matchmaking e roleta (/times, /oquejogar, /adicionarjogo)
 │   ├── giveaways.py           # Monitoramento automático de jogos grátis
 │   ├── media.py               # Embed Fixer de links de redes sociais
-│   └── quotes.py              # Caderno de Pérolas (/quote)
+│   ├── quotes.py              # Caderno de Pérolas (/quote)
+│   └── welcome.py             # Recepção automática de membros (/boasvindas)
 ├── config/
 │   └── settings.py            # Carregamento e validação das variáveis do .env
 ├── data/                      # Persistência de dados em JSON
 │   ├── games.json
 │   ├── giveaways.json
-│   └── quotes.json
+│   ├── quotes.json
+│   └── welcome.json
 ├── utils/
 │   └── storage.py             # Funções utilitárias de leitura e gravação
 ├── .env                       # Segredos locais (NUNCA commitado - listado no .gitignore)

@@ -4,10 +4,11 @@ import discord
 from discord.ext import commands
 from config.settings import BOT_TOKEN, GUILD_ID
 
-def create_bot(enable_message_content: bool = True) -> commands.Bot:
+def create_bot(enable_message_content: bool = True, enable_members: bool = True) -> commands.Bot:
     intents = discord.Intents.default()
     intents.guilds = True
     intents.voice_states = True
+    intents.members = enable_members
     intents.message_content = enable_message_content
 
     bot = commands.Bot(
@@ -22,20 +23,26 @@ def create_bot(enable_message_content: bool = True) -> commands.Bot:
         print("=" * 55)
         print(f"Simple AI Online: {bot.user} (ID: {bot.user.id})")
         
+        # Sincroniza globalmente para que todos os servidores onde o bot está recebam os comandos
+        try:
+            global_synced = await bot.tree.sync()
+            print(f"Slash Commands sincronizados globalmente ({len(global_synced)} comandos).")
+        except Exception as e:
+            print(f"Erro ao sincronizar comandos globalmente: {e}")
+
         if GUILD_ID:
             guild = discord.Object(id=GUILD_ID)
             try:
                 bot.tree.copy_global_to(guild=guild)
                 synced = await bot.tree.sync(guild=guild)
-                print(f"Slash Commands sincronizados no servidor {GUILD_ID} ({len(synced)} comandos).")
+                print(f"Slash Commands sincronizados no servidor principal {GUILD_ID} ({len(synced)} comandos).")
             except Exception as e:
                 print(f"Erro ao sincronizar comandos com a guilda: {e}")
-        else:
-            synced = await bot.tree.sync()
-            print(f"Slash Commands sincronizados globalmente ({len(synced)} comandos).")
 
         status_prefix = "Ativo" if enable_message_content else "Ativo apenas via menção (@Simple AI)"
+        status_members = "Ativo" if enable_members else "Desativado (Requer Server Members Intent)"
         print(f"Prefixo !st: {status_prefix}")
+        print(f"Monitoramento de Membros: {status_members}")
         print("Bot 100% pronto e escalável com Cogs!")
         print("=" * 55)
 
@@ -57,6 +64,7 @@ def create_bot(enable_message_content: bool = True) -> commands.Bot:
         embed.add_field(name="🎁 !st jogosgratis", value="Consulta promoções ativas de jogos grátis para PC.", inline=False)
         embed.add_field(name="🧠 !st perguntar <dúvida>", value="Envia uma pergunta para a IA do Google Gemini.", inline=False)
         embed.add_field(name="🥙 !st kebab", value="Invoca a iguaria cibernética Kebabtech.", inline=False)
+        embed.add_field(name="👋 !st boasvindas <ativar/desativar/status/testar>", value="Gerencia a recepção automática para novos membros.", inline=False)
         embed.set_footer(text="Exemplo: !st kebab ou @Simple AI times")
         await ctx.send(embed=embed)
 
@@ -74,19 +82,27 @@ async def load_cogs(bot: commands.Bot):
             except Exception as e:
                 print(f"[Cogs] Erro ao carregar {extension_name}: {e}")
 
-async def run(enable_message_content: bool):
-    bot = create_bot(enable_message_content=enable_message_content)
+async def run(enable_message_content: bool, enable_members: bool = True):
+    bot = create_bot(enable_message_content=enable_message_content, enable_members=enable_members)
     async with bot:
         await load_cogs(bot)
         await bot.start(BOT_TOKEN)
 
 if __name__ == "__main__":
     try:
-        asyncio.run(run(enable_message_content=True))
+        asyncio.run(run(enable_message_content=True, enable_members=True))
     except discord.errors.PrivilegedIntentsRequired:
         print("\n" + "=" * 65)
-        print("⚠️ AVISO: 'Message Content Intent' não está ativo no Developer Portal.")
-        print("Iniciando modo fallback (Slash Commands e menções @Simple AI ativos).")
-        print("Para liberar prefixos de texto puro (!st ...), marque a caixinha no portal!")
+        print("⚠️ AVISO: 'Message Content' ou 'Server Members' intent não está ativo no Portal.")
+        print("Tentando inicializar com fallback de intents...")
         print("=" * 65 + "\n")
-        asyncio.run(run(enable_message_content=False))
+        try:
+            asyncio.run(run(enable_message_content=False, enable_members=True))
+        except discord.errors.PrivilegedIntentsRequired:
+            print("\n" + "=" * 65)
+            print("⚠️ AVISO: 'Server Members Intent' também não está ativo no Developer Portal!")
+            print("Para a recepção de novos membros funcionar, ative 'Server Members Intent' no portal.")
+            print("Iniciando em modo seguro (sem monitoramento de entrada de membros)...")
+            print("=" * 65 + "\n")
+            asyncio.run(run(enable_message_content=False, enable_members=False))
+

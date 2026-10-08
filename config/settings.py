@@ -24,6 +24,7 @@ DATA_DIR.mkdir(parents=True, exist_ok=True)
 QUOTES_FILE = DATA_DIR / "quotes.json"
 GAMES_FILE = DATA_DIR / "games.json"
 GIVEAWAYS_FILE = DATA_DIR / "giveaways.json"
+WELCOME_FILE = DATA_DIR / "welcome.json"
 
 if not BOT_TOKEN:
     raise ValueError("A variável de ambiente 'DISCORD_BOT_TOKEN' não foi definida no arquivo .env!")

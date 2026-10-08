@@ -69,7 +69,8 @@ class AICog(commands.Cog, name="Inteligência Artificial"):
     @app_commands.describe(pergunta="O que você deseja perguntar?")
     async def perguntar(self, ctx: commands.Context, *, pergunta: str):
         await ctx.defer()
-        sys_prompt = "Você é o Simple AI, assistente do servidor 'The Simple Place'. Responda com bom humor, clareza e seja amigável."
+        guild_name = ctx.guild.name if ctx.guild else "Discord"
+        sys_prompt = f"Você é o Simple AI, assistente do servidor '{guild_name}'. Responda com bom humor, clareza e seja amigável."
         resposta = await self.query_gemini(pergunta, system_context=sys_prompt)
         if len(resposta) > 2000:
             resposta = resposta[:1990] + "..."
@@ -85,7 +86,8 @@ class AICog(commands.Cog, name="Inteligência Artificial"):
             clean_content = message.content.replace(f"<@{self.bot.user.id}>", "").strip()
             if clean_content:
                 async with message.channel.typing():
-                    sys_prompt = "Você é o Simple AI, assistente oficial do servidor 'The Simple Place'. Responda de forma descontraída e bem-humorada em português."
+                    guild_name = message.guild.name if message.guild else "Discord"
+                    sys_prompt = f"Você é o Simple AI, assistente oficial do servidor '{guild_name}'. Responda de forma descontraída e bem-humorada em português."
                     reply = await self.query_gemini(clean_content, system_context=sys_prompt)
                     await message.reply(reply[:2000])
 
