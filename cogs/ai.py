@@ -38,11 +38,32 @@ class AICog(commands.Cog, name="Inteligência Artificial"):
                             text = candidates[0].get("content", {}).get("parts", [{}])[0].get("text", "")
                             return text.strip() if text else "Não consegui gerar uma resposta."
                         return "Resposta vazia recebida do Gemini."
+                    elif resp.status == 429:
+                        return (
+                            "⏳ **Limite de uso atingido!**\n"
+                            "A cota gratuita de mensagens da API do Gemini atingiu o limite temporário por minuto ou dia. "
+                            "Por favor, aguarde um instante e tente novamente!"
+                        )
+                    elif resp.status in (500, 503):
+                        return (
+                            "🔥 **Alta demanda nos servidores da Google!**\n"
+                            "O modelo do Gemini está enfrentando uma sobrecarga temporária de requisições no momento. "
+                            "Aguarde alguns segundos e tente perguntar novamente."
+                        )
+                    elif resp.status in (401, 403):
+                        return (
+                            "🔑 **Chave da API do Gemini não autorizada!**\n"
+                            "Verifique se o `GEMINI_API_KEY` no arquivo `.env` está correto."
+                        )
                     else:
-                        error_text = await resp.text()
-                        return f"Erro na API do Gemini ({resp.status}): {error_text[:100]}"
-        except Exception as e:
-            return f"Erro ao contatar o Gemini: {e}"
+                        return (
+                            f"⚠️ **O Gemini não pôde responder no momento** (Erro {resp.status}). "
+                            "Tente novamente em instantes."
+                        )
+        except aiohttp.ClientConnectorError:
+            return "🔌 **Erro de conexão:** Não foi possível alcançar os servidores do Google Gemini no momento."
+        except Exception:
+            return "⚠️ **Erro inesperado ao consultar a IA:** Tente novamente mais tarde."
 
     @commands.hybrid_command(name="perguntar", aliases=["pergunte"], description="Faça uma pergunta para a inteligência artificial do Gemini")
     @app_commands.describe(pergunta="O que você deseja perguntar?")
