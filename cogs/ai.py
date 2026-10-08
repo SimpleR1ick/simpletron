@@ -2,7 +2,7 @@ import aiohttp
 import discord
 from discord import app_commands
 from discord.ext import commands
-from config.settings import GEMINI_API_KEY
+from config.settings import GEMINI_API_KEY, GEMINI_MODEL
 
 class AICog(commands.Cog, name="Inteligência Artificial"):
     """Comandos e interações com a IA Google Gemini."""
@@ -17,7 +17,7 @@ class AICog(commands.Cog, name="Inteligência Artificial"):
                 "Gere uma chave gratuita em https://aistudio.google.com/ e preencha a variável `GEMINI_API_KEY`."
             )
 
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key={GEMINI_API_KEY}"
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent?key={GEMINI_API_KEY}"
         payload = {
             "contents": [
                 {

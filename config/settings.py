@@ -15,6 +15,7 @@ except ValueError:
     GUILD_ID = 0
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-flash-latest")
 
 # Diretórios
 DATA_DIR = BASE_DIR / "data"
