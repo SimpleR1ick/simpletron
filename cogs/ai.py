@@ -44,31 +44,23 @@ class AICog(commands.Cog, name="Inteligência Artificial"):
         except Exception as e:
             return f"Erro ao contatar o Gemini: {e}"
 
-    @app_commands.command(name="perguntar", description="Faça uma pergunta para a inteligência artificial do Gemini")
+    @commands.hybrid_command(name="perguntar", aliases=["pergunte"], description="Faça uma pergunta para a inteligência artificial do Gemini")
     @app_commands.describe(pergunta="O que você deseja perguntar?")
-    async def cmd_perguntar(self, interaction: discord.Interaction, pergunta: str):
-        await interaction.response.defer()
+    async def perguntar(self, ctx: commands.Context, *, pergunta: str):
+        await ctx.defer()
         sys_prompt = "Você é o Simple AI, assistente do servidor 'The Simple Place'. Responda com bom humor, clareza e seja amigável."
         resposta = await self.query_gemini(pergunta, system_context=sys_prompt)
         if len(resposta) > 2000:
             resposta = resposta[:1990] + "..."
-        await interaction.followup.send(f"🧠 **Pergunta:** {pergunta}\n\n{resposta}")
-
-    @commands.command(name="perguntar", aliases=["pergunte"], help="Pergunta para a IA via prefixo: !st perguntar <dúvida>")
-    async def prefix_perguntar(self, ctx: commands.Context, *, pergunta: str):
-        async with ctx.typing():
-            sys_prompt = "Você é o Simple AI, assistente do servidor 'The Simple Place'. Responda com bom humor, clareza e seja amigável."
-            resposta = await self.query_gemini(pergunta, system_context=sys_prompt)
-            if len(resposta) > 2000:
-                resposta = resposta[:1990] + "..."
-            await ctx.reply(f"🧠 **Pergunta:** {pergunta}\n\n{resposta}")
+        await ctx.send(f"🧠 **Pergunta:** {pergunta}\n\n{resposta}")
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
         if message.author.bot:
             return
 
-        if self.bot.user in message.mentions and not message.mention_everyone:
+        # Responder a menções diretas @Simple AI quando não for comando prefixado
+        if self.bot.user in message.mentions and not message.mention_everyone and not message.content.startswith("!"):
             clean_content = message.content.replace(f"<@{self.bot.user.id}>", "").strip()
             if clean_content:
                 async with message.channel.typing():

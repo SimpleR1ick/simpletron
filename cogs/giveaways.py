@@ -1,7 +1,6 @@
 import datetime
 import aiohttp
 import discord
-from discord import app_commands
 from discord.ext import commands, tasks
 from config.settings import GIVEAWAYS_FILE, GUILD_ID
 from utils.storage import load_json, save_json
@@ -71,24 +70,14 @@ class GiveawaysCog(commands.Cog, name="Jogos Grátis"):
     async def before_free_games_loop(self):
         await self.bot.wait_until_ready()
 
-    @app_commands.command(name="jogosgratis", description="Verifica se há novos jogos grátis na Steam/Epic Games no momento")
-    async def cmd_jogosgratis(self, interaction: discord.Interaction):
-        await interaction.response.defer()
-        channel = interaction.channel
-        offers = await self.check_free_games(channel=channel, send_only_new=False)
+    @commands.hybrid_command(name="jogosgratis", description="Verifica se há novos jogos grátis na Steam/Epic Games no momento")
+    async def jogosgratis(self, ctx: commands.Context):
+        await ctx.defer()
+        offers = await self.check_free_games(channel=ctx.channel, send_only_new=False)
         if not offers:
-            await interaction.followup.send("Nenhuma promoção de jogo grátis encontrada no momento.")
+            await ctx.send("Nenhuma promoção de jogo grátis encontrada no momento.")
         else:
-            await interaction.followup.send("Encontrei as ofertas acima para PC!")
-
-    @commands.command(name="jogosgratis", help="Verifica jogos grátis via prefixo !st jogosgratis")
-    async def prefix_jogosgratis(self, ctx: commands.Context):
-        async with ctx.typing():
-            offers = await self.check_free_games(channel=ctx.channel, send_only_new=False)
-            if not offers:
-                await ctx.send("Nenhuma promoção de jogo grátis encontrada no momento.")
-            else:
-                await ctx.send("Encontrei as ofertas acima para PC!")
+            await ctx.send("Encontrei as ofertas acima para PC!")
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(GiveawaysCog(bot))
