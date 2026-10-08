@@ -33,19 +33,22 @@ O **Simpletron** nasceu para resolver o problema clássico de servidores de amig
 
 ---
 
-## 🎮 Comandos Disponíveis (Slash Commands)
+## 🎮 Comandos Disponíveis (Slash Commands & Prefixo `!st`)
 
-| Comando | Descrição | Exemplo de Uso |
-| :--- | :--- | :--- |
-| `/times [canal]` | Divide os membros conectados na chamada de voz em 2 equipes (Azul e Vermelho). | `/times` |
-| `/oquejogar` | Sorteia aleatoriamente um jogo da roleta do grupo. | `/oquejogar` |
-| `/adicionarjogo <nome>` | Adiciona um novo título à lista de opções da roleta. | `/adicionarjogo Lethal Company` |
-| `/quote add <@autor> <frase>` | Salva uma pérola histórica com autor, quem salvou e data. | `/quote add @amigo "não fui eu"` |
-| `/quote random` | Sorteia e exibe uma frase marcante salva no servidor. | `/quote random` |
-| `/quote listar` | Mostra o total de pérolas acumuladas no caderno. | `/quote listar` |
-| `/jogosgratis` | Consulta promoções ativas de jogos 100% gratuitos para PC. | `/jogosgratis` |
-| `/perguntar <pergunta>` | Envia uma dúvida para a IA do Google Gemini. | `/perguntar quem tem razão?` |
-| `/kebab` | Invoca a iguaria cibernética definitiva de Night City. | `/kebab` |
+Todos os comandos podem ser acionados tanto por comandos de barra (`/`) quanto pelo prefixo **`!st`** (ou mencionando **`@Simple AI`**), servindo como fallback caso a interface do Discord apresente instabilidade:
+
+| Comando Slash | Prefixo Alternativo (`!st`) | Descrição | Exemplo |
+| :--- | :--- | :--- | :--- |
+| `/times [canal]` | `!st times [canal]` | Divide os membros conectados na chamada de voz em 2 equipes. | `!st times` |
+| `/oquejogar` | `!st oquejogar` | Sorteia aleatoriamente um jogo da roleta do grupo. | `!st oquejogar` |
+| `/adicionarjogo <nome>` | `!st adicionarjogo <nome>` | Adiciona um novo título à lista da roleta. | `!st adicionarjogo Lethal Company` |
+| `/quote add <autor> <frase>` | `!st quote add @autor frase` | Salva uma pérola histórica no caderno do servidor. | `!st quote add @amigo "não fui eu"` |
+| `/quote random` | `!st quote random` | Sorteia e exibe uma frase marcante salva no servidor. | `!st quote random` |
+| `/quote listar` | `!st quote listar` | Mostra o total de pérolas acumuladas no caderno. | `!st quote listar` |
+| `/jogosgratis` | `!st jogosgratis` | Consulta promoções ativas de jogos 100% gratuitos para PC. | `!st jogosgratis` |
+| `/perguntar <pergunta>` | `!st perguntar <dúvida>` | Envia uma dúvida para a IA do Google Gemini. | `!st perguntar quem tem razão?` |
+| `/kebab` | `!st kebab` | Invoca a iguaria cibernética Kebabtech de Night City. | `!st kebab` |
+| — | `!st ajuda` | Exibe o menu com todos os comandos alternativos. | `!st ajuda` |
 
 > 💡 **Embed Fixer:** Funciona automaticamente no chat de texto (especialmente em `#memes-e-midia`). Ao postar links do Twitter, Instagram Reels, TikTok ou Reddit, o bot reescreve com o preview corrigido.
 

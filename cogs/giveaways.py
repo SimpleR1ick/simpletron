@@ -81,5 +81,14 @@ class GiveawaysCog(commands.Cog, name="Jogos Grátis"):
         else:
             await interaction.followup.send("Encontrei as ofertas acima para PC!")
 
+    @commands.command(name="jogosgratis", help="Verifica jogos grátis via prefixo !st jogosgratis")
+    async def prefix_jogosgratis(self, ctx: commands.Context):
+        async with ctx.typing():
+            offers = await self.check_free_games(channel=ctx.channel, send_only_new=False)
+            if not offers:
+                await ctx.send("Nenhuma promoção de jogo grátis encontrada no momento.")
+            else:
+                await ctx.send("Encontrei as ofertas acima para PC!")
+
 async def setup(bot: commands.Bot):
     await bot.add_cog(GiveawaysCog(bot))

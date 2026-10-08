@@ -54,6 +54,15 @@ class AICog(commands.Cog, name="Inteligência Artificial"):
             resposta = resposta[:1990] + "..."
         await interaction.followup.send(f"🧠 **Pergunta:** {pergunta}\n\n{resposta}")
 
+    @commands.command(name="perguntar", aliases=["pergunte"], help="Pergunta para a IA via prefixo: !st perguntar <dúvida>")
+    async def prefix_perguntar(self, ctx: commands.Context, *, pergunta: str):
+        async with ctx.typing():
+            sys_prompt = "Você é o Simple AI, assistente do servidor 'The Simple Place'. Responda com bom humor, clareza e seja amigável."
+            resposta = await self.query_gemini(pergunta, system_context=sys_prompt)
+            if len(resposta) > 2000:
+                resposta = resposta[:1990] + "..."
+            await ctx.reply(f"🧠 **Pergunta:** {pergunta}\n\n{resposta}")
+
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
         if message.author.bot:

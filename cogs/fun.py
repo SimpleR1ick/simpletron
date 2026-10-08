@@ -12,10 +12,12 @@ class FunCog(commands.Cog, name="Diversão e Memes"):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    @app_commands.command(name="kebab", description="Kebabtech: o ápice da culinária cibernética de Night City")
-    async def cmd_kebab(self, interaction: discord.Interaction):
+    async def _send_kebab(self, target, user_display_name: str):
         if not KEBAB_IMAGE.exists():
-            await interaction.response.send_message("❌ Imagem do kebab não encontrada!", ephemeral=True)
+            if hasattr(target, "response"):
+                await target.response.send_message("❌ Imagem do kebab não encontrada!", ephemeral=True)
+            else:
+                await target.send("❌ Imagem do kebab não encontrada!")
             return
 
         file = discord.File(KEBAB_IMAGE, filename="kebab.png")
@@ -25,9 +27,20 @@ class FunCog(commands.Cog, name="Diversão e Memes"):
             color=discord.Color.from_rgb(255, 175, 55)
         )
         embed.set_image(url="attachment://kebab.png")
-        embed.set_footer(text=f"Servido com molho especial para {interaction.user.display_name}")
+        embed.set_footer(text=f"Servido com molho especial para {user_display_name}")
 
-        await interaction.response.send_message(embed=embed, file=file)
+        if hasattr(target, "response"):
+            await target.response.send_message(embed=embed, file=file)
+        else:
+            await target.send(embed=embed, file=file)
+
+    @app_commands.command(name="kebab", description="Kebabtech: o ápice da culinária cibernética de Night City")
+    async def cmd_kebab(self, interaction: discord.Interaction):
+        await self._send_kebab(interaction, interaction.user.display_name)
+
+    @commands.command(name="kebab", help="Envia o Kebabtech via prefixo !st kebab")
+    async def prefix_kebab(self, ctx: commands.Context):
+        await self._send_kebab(ctx, ctx.author.display_name)
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(FunCog(bot))

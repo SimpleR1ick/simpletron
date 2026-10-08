@@ -4,35 +4,65 @@ import discord
 from discord.ext import commands
 from config.settings import BOT_TOKEN, GUILD_ID
 
-# Configuração de Intents
-intents = discord.Intents.default()
-intents.guilds = True
-intents.voice_states = True
-intents.message_content = False  # Ative após habilitar 'Message Content Intent' no Developer Portal
+def create_bot(enable_message_content: bool = True) -> commands.Bot:
+    intents = discord.Intents.default()
+    intents.guilds = True
+    intents.voice_states = True
+    intents.message_content = enable_message_content
 
-bot = commands.Bot(command_prefix="!", intents=intents)
+    bot = commands.Bot(
+        command_prefix=commands.when_mentioned_or("!st ", "!st"),
+        intents=intents,
+        case_insensitive=True,
+        help_command=None
+    )
 
-@bot.event
-async def on_ready():
-    print("=" * 55)
-    print(f"Simple AI Online: {bot.user} (ID: {bot.user.id})")
-    
-    if GUILD_ID:
-        guild = discord.Object(id=GUILD_ID)
-        try:
-            bot.tree.copy_global_to(guild=guild)
-            synced = await bot.tree.sync(guild=guild)
-            print(f"Slash Commands sincronizados no servidor {GUILD_ID} ({len(synced)} comandos).")
-        except Exception as e:
-            print(f"Erro ao sincronizar comandos com a guilda: {e}")
-    else:
-        synced = await bot.tree.sync()
-        print(f"Slash Commands sincronizados globalmente ({len(synced)} comandos).")
+    @bot.event
+    async def on_ready():
+        print("=" * 55)
+        print(f"Simple AI Online: {bot.user} (ID: {bot.user.id})")
+        
+        if GUILD_ID:
+            guild = discord.Object(id=GUILD_ID)
+            try:
+                bot.tree.copy_global_to(guild=guild)
+                synced = await bot.tree.sync(guild=guild)
+                print(f"Slash Commands sincronizados no servidor {GUILD_ID} ({len(synced)} comandos).")
+            except Exception as e:
+                print(f"Erro ao sincronizar comandos com a guilda: {e}")
+        else:
+            synced = await bot.tree.sync()
+            print(f"Slash Commands sincronizados globalmente ({len(synced)} comandos).")
 
-    print("Bot 100% pronto e escalável com Cogs!")
-    print("=" * 55)
+        status_prefix = "Ativo" if enable_message_content else "Ativo apenas via menção (@Simple AI)"
+        print(f"Prefixo !st: {status_prefix}")
+        print("Bot 100% pronto e escalável com Cogs!")
+        print("=" * 55)
 
-async def load_cogs():
+    @bot.command(name="ajuda", aliases=["help", "comandos"])
+    async def cmd_ajuda(ctx: commands.Context):
+        """Exibe a lista de comandos disponíveis via prefixo !st."""
+        embed = discord.Embed(
+            title="📖 Comandos Alternativos — Simple AI (!st)",
+            description=(
+                "Quando os comandos de barra (`/`) estiverem indisponíveis, "
+                "você pode usar o prefixo **`!st`** ou mencionar **`@Simple AI`** diretamente no chat!\n\u200b"
+            ),
+            color=discord.Color.blue()
+        )
+        embed.add_field(name="⚔️ !st times", value="Divide os amigos conectados no canal de voz em 2 equipes.", inline=False)
+        embed.add_field(name="🎮 !st oquejogar", value="Sorteia um jogo da roleta do grupo.", inline=False)
+        embed.add_field(name="➕ !st adicionarjogo <nome>", value="Adiciona um novo jogo à lista da roleta.", inline=False)
+        embed.add_field(name="🗣️ !st quote <add/random/listar>", value="Gerencia e sorteia pérolas do servidor.", inline=False)
+        embed.add_field(name="🎁 !st jogosgratis", value="Consulta promoções ativas de jogos grátis para PC.", inline=False)
+        embed.add_field(name="🧠 !st perguntar <dúvida>", value="Envia uma pergunta para a IA do Google Gemini.", inline=False)
+        embed.add_field(name="🥙 !st kebab", value="Invoca a iguaria cibernética Kebabtech.", inline=False)
+        embed.set_footer(text="Exemplo: !st kebab ou @Simple AI times")
+        await ctx.send(embed=embed)
+
+    return bot
+
+async def load_cogs(bot: commands.Bot):
     """Carrega dinamicamente todas as extensões da pasta cogs/."""
     cogs_dir = Path(__file__).parent / "cogs"
     for file in cogs_dir.glob("*.py"):
@@ -44,18 +74,19 @@ async def load_cogs():
             except Exception as e:
                 print(f"[Cogs] Erro ao carregar {extension_name}: {e}")
 
-async def main():
+async def run(enable_message_content: bool):
+    bot = create_bot(enable_message_content=enable_message_content)
     async with bot:
-        await load_cogs()
+        await load_cogs(bot)
         await bot.start(BOT_TOKEN)
 
 if __name__ == "__main__":
     try:
-        asyncio.run(main())
+        asyncio.run(run(enable_message_content=True))
     except discord.errors.PrivilegedIntentsRequired:
-        print("\n" + "=" * 60)
-        print("⚠️ AVISO: O 'Message Content Intent' não está ativado no Discord Developer Portal.")
-        print("Iniciando sem ele...")
-        print("=" * 60 + "\n")
-        bot.intents.message_content = False
-        asyncio.run(main())
+        print("\n" + "=" * 65)
+        print("⚠️ AVISO: 'Message Content Intent' não está ativo no Developer Portal.")
+        print("Iniciando modo fallback (Slash Commands e menções @Simple AI ativos).")
+        print("Para liberar prefixos de texto puro (!st ...), marque a caixinha no portal!")
+        print("=" * 65 + "\n")
+        asyncio.run(run(enable_message_content=False))
